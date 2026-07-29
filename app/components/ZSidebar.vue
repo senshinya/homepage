@@ -6,7 +6,7 @@ const sidebarStore = useSidebarStore()
 <template>
 <aside id="z-sidebar" :class="{ show: sidebarStore.isOpen }">
 	<header class="aside-header">
-		<ZhiluIcon />
+		<ZAvatar class="aside-avatar" />
 		<span>{{ appConfig.author.name }}</span>
 		<Icon name="ri:close-line" class="close-sidebar" @click="sidebarStore.toggle()" />
 	</header>
@@ -97,6 +97,10 @@ const sidebarStore = useSidebarStore()
 	height: 48px;
 	padding-inline: 1rem;
 	font-weight: 600;
+}
+
+.aside-avatar {
+	font-size: 1.5rem;
 }
 
 .aside-nav {

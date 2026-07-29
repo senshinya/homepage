@@ -8,7 +8,7 @@ const appConfig = useAppConfig()
 </script>
 
 <template>
-<ZhiluAvatar class="avatar" />
+<ZAvatar class="avatar" />
 
 <div class="wrapper">
 	<ZField>
