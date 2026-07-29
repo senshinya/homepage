@@ -25,6 +25,22 @@ export function getGhAvatar(name: string, options?: Record<string, any>) {
 	return url
 }
 
+/** 任意域名的站点图标。unavatar 覆盖面比写死一张映射表大得多 */
+export function getFavicon(domain: string, size = 64) {
+	return `https://unavatar.webp.se/google/${domain}?w=${size}`
+}
+
+/**
+ * 碎语链接卡上那格 og:image 的取图地址。
+ *
+ * 站点给 og:image 放的多是 1200×630、几百 KB 的大图，而卡片上那格缩略图不过百来像素宽。
+ * 借 wsrv 在它那头缩好再回来，顺带解决防盗链——wsrv 去取图时不带 Referer，
+ * 而不少站点的 og:image 直连会吃 403。
+ */
+export function getOgImgUrl(src: string, width: number) {
+	return `https://wsrv.nl/?url=${encodeURIComponent(src)}&w=${width}&output=webp`
+}
+
 export function isExtLink(url?: string) {
 	return !!url?.includes(':')
 }
