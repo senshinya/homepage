@@ -4,7 +4,7 @@ definePageMeta({ headerText: '最近更新' })
 
 const { data, error, status } = useLazyFetch('/api/feed/blog')
 
-const articles = computed(() => data.value?.slice(0, 11) ?? [])
+const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </script>
 
 <template>
