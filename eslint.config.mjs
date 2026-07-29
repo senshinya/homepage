@@ -32,5 +32,11 @@ export default antfu({
 		}],
 	},
 }, {
-	ignores: ['.superpowers/**', 'docs/superpowers/**', 'pnpm-workspace.yaml'],
+	files: ['pnpm-workspace.yaml'],
+	rules: {
+		'pnpm/yaml-enforce-settings': 'off',
+		'yaml/sort-keys': 'off',
+	},
+}, {
+	ignores: ['.superpowers/**', 'docs/superpowers/plans/**'],
 })
