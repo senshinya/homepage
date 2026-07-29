@@ -70,54 +70,66 @@ drwxr-xr-x@ 3 shinya  staff     96 Jul 29 20:45 ..
 
 ## 备注
 
-### 预渲染配置调整（初版问题）
+### 预渲染配置调整（初版问题与二次修复）
+
+**第一轮修复的问题：**
 初版添加了 `crawlLinks: false` 和 `failOnError: false` 两个选项。审查发现问题：
-- `crawlLinks: false` 导致只生成 6 条路由（`/robots.txt`、`/sitemap.xml`、`/api/feed/blog`、`/__sitemap__/style.xsl`、`/404.html`、`/200.html`），**完全没生成任何页面**（无 `index.html`、无 `/article`、`/project`、`/site`、`/log`）
-- 这是破坏性配置，产物部署后会导致首页 404
+- `crawlLinks: false` 导致只生成 6 条路由，**完全没生成任何页面**（无 `index.html`、无 `/article`、`/project`、`/site`、`/log`）
+- 这是破坏性配置
 
-### 修复方案
-删除 `crawlLinks: false`，只保留 `nitro.prerender.failOnError: false`。效果验证：
+第一轮修复删除了 `crawlLinks: false`，但 `failOnError: false` 本身存在缺陷：会将所有预渲染错误静默吞掉，包括真实的预渲染崩溃。
 
-**修复后 ls -la .output/public/**
+**第二轮修复（当前）：**
+发现并采用了更窄的方案：`nitro.prerender.ignore: ['/memos']`
+
+这个配置的工作原理与效果验证：
+- Nitro 的预渲染爬虫会跳过 ignore 列表中的路由
+- 但其他链接的真实 404 或预渲染错误仍会导致构建失败
+- 这是更精准的安全网：只忽略指定的 `/memos`，其他真实错误仍阻断
+
+**安全网回归测试：**
+在 `app/pages/log.vue` 中临时插入指向不存在路由的链接 `<a href="/totally-broken-route-xyz">broken link</a>`，验证构建失败：
+
 ```
-total 216
--rw-r--r--@  1 shinya  staff    69B  _payload.json
--rw-r--r--@  1 shinya  staff   3.3K  200.html
--rw-r--r--@  1 shinya  staff   3.3K  404.html
--rw-r--r--@  1 shinya  staff    39K  icon.png
--rw-r--r--@  1 shinya  staff    19K  icon.svg
--rw-r--r--@  1 shinya  staff    25K  index.html
--rw-r--r--@  1 shinya  staff   117B  robots.txt
--rw-r--r--@  1 shinya  staff   2.4K  sitemap.xml
-drwxr-xr-x@  3  shinya  staff   576  _nuxt
-drwxr-xr-x@  5  shinya  staff   160  api
-drwxr-xr-x@  4  shinya  staff   128  article
-drwxr-xr-x@  3  shinya  staff    96  __sitemap__
-drwxr-xr-x@  4  shinya  staff   128  home
-drwxr-xr-x@  4  shinya  staff   128  log
-drwxr-xr-x@  4  shinya  staff   128  project
-drwxr-xr-x@  4  shinya  staff   128  site
+Errors prerendering:
+[nitro]   ├─ /totally-broken-route-xyz (5ms)
+  │ ├── [404] Page not found: /totally-broken-route-xyz
+  │ └── Linked from /log
+
+ERROR  Exiting due to prerender errors.
 ```
-✅ 所有页面正常生成（index.html、article/、project/、site/、log/、home/）
-✅ 预渲染 21 条路由成功
 
-### 配置的窄度权衡
-尝试过的更窄方案：
-- `seo.linkChecker.failOnError: false`：不是有效配置，无法禁用 @nuxtjs/seo 的链接检查
-- `nitro.prerender.failOnError: false` 的副作用：会将所有预渲染错误静默，不仅是 `/memos` 的 404
+✅ 证明 ignore 方案有效：`/memos` 被正确忽略，但真实的坏链接仍导致构建失败。
 
-验证后的真实情况：即使在页面中插入 `throw new Error()`，该配置也会让构建成功（exit code 0），报告错误但不中止。这不是最优的安全网，但是：
-1. 简报本身没预见到 `/memos` 问题（简报的缺陷）
-2. 这个配置只需要维持到 Task 8（创建 /memos 后删除）
-3. 审查者确认这是可接受的折方案
+**最终输出验证：**
+```
+ls .output/public/ | grep -E "index.html|article|project|site|log|home"
+index.html
+article
+home
+log
+project
+site
+```
+✅ 预渲染 21 条路由，所有页面正常生成
 
-### 临时配置清理指示
-在 `nuxt.config.ts` 的注释中已标注这是临时配置，应在 Task 8 删除：
+### 技术修正
+初版注释中提到"link-checker 会把这条 404 当阻断错误"是不准确的。实际上：
+- `nuxt-link-checker` 模块的 `failOnError` 默认值是 `false`，它本身不是阻断源
+- **真正的阻断源是 Nitro 的预渲染爬虫**：它爬到真实 404 时会中断构建
+- 这两套是独立的机制
+
+### 配置说明
 ```ts
-// 临时禁用预渲染的 link-checker 阻断性错误：导航已指向 /memos
-// 但该页面在 Task 8 才创建。link-checker 会把这条 404 当阻断错误。
-// Task 8 建好页面后应删除本配置。
-failOnError: false,
+nitro: {
+  prerender: {
+    routes: ['/api/feed/blog'],
+    // 导航已指向 /memos 但该页面在 Task 8 才创建。Nitro 的预渲染爬虫爬到
+    // 这条真实 404 会中断构建。ignore 列表让爬虫跳过这条 404，但其他链接
+    // 的真实错误仍会中止预渲染。Task 8 建好页面后删除本配置。
+    ignore: ['/memos'],
+  },
+},
 ```
 
 ### 最终验证概要
@@ -125,6 +137,6 @@ failOnError: false,
 - 构建：✅ 成功（产出 21 条路由）
 - 页面生成：✅ index.html、article/、project/、site/、log/、home/ 均存在
 - 预渲染 API：✅ `/api/feed/blog` 生成成功
-- 图标文件：✅ icon.svg、icon.png 均存在
+- 安全网验证：✅ 真实的坏链接导致构建失败，ignore 机制有效
 
-最终 commit：0b8a726（修复），基于 4cc0914（初版）
+最终 commit：0b8a726（第一轮修复）
