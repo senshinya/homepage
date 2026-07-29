@@ -1,6 +1,15 @@
 <script setup lang="ts">
 const appConfig = useAppConfig()
 const sidebarStore = useSidebarStore()
+
+// 窄屏下侧栏是盖在内容上的抽屉，跳转后必须收起，否则落地页被自己挡着，
+// 还得再点一次遮罩才能看。宽屏 isOpen 不参与显示（.show 只在断点内生效），
+// 所以不必判断视口宽度。
+//
+// 用路由变化而不是给每个链接挂 click：back/forward 和任何程序化跳转也该收起。
+// 但路由变化盖不住「点当前所在的那一栏」——路径没变，watch 不触发，抽屉就赖着
+// 不动，而那恰恰是最容易被当成卡死的一种点法，故两个触发都留着
+watch(() => useRoute().fullPath, sidebarStore.close)
 </script>
 
 <template>
@@ -17,7 +26,12 @@ const sidebarStore = useSidebarStore()
 			</h2>
 			<menu>
 				<li v-for="(item, itemIndex) in group.items" :key="itemIndex">
-					<ZRawLink v-slot="{ external }" :to="item.url" class="aside-nav-item">
+					<ZRawLink
+						v-slot="{ external }"
+						:to="item.url"
+						class="aside-nav-item"
+						@click="sidebarStore.close()"
+					>
 						<Icon :name="item.icon" />
 						<span class="nav-text">{{ item.text }}</span>
 						<Icon v-if="external" class="external-tip" name="ri:arrow-right-up-line" />

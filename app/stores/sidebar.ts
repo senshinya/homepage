@@ -5,8 +5,13 @@ export const useSidebarStore = defineStore('sidebar', () => {
 		isOpen.value = !isOpen.value
 	}
 
+	const close = () => {
+		isOpen.value = false
+	}
+
 	return {
 		isOpen,
 		toggle,
+		close,
 	}
 })
