@@ -26,6 +26,7 @@
     "embla-carousel-vue": "catalog:ui",
     "embla-carousel-wheel-gestures": "catalog:ui",
     "fast-xml-parser": "catalog:util",
+    "marked": "catalog:util",
     "nuxt": "catalog:framework",
     "pinia": "catalog:framework",
     "temporal-polyfill": "catalog:util",
