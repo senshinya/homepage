@@ -61,10 +61,10 @@ export default defineNuxtConfig({
 			// useLazyFetch，预渲染爬虫看不到这个请求。不显式列出的话
 			// .output/public/api/feed/blog 不存在，线上取数直接 404
 			routes: ['/api/feed/blog'],
-			// 临时禁用预渲染的 link-checker 阻断性错误：导航已指向 /memos
-			// 但该页面在 Task 8 才创建。link-checker 会把这条 404 当阻断错误。
-			// Task 8 建好页面后应删除本配置。
-			failOnError: false,
+			// 导航已指向 /memos 但该页面在 Task 8 才创建。Nitro 的预渲染爬虫爬到
+			// 这条真实 404 会中断构建。ignore 列表让爬虫跳过这条 404，但其他链接
+			// 的真实错误仍会中止预渲染。Task 8 建好页面后删除本配置。
+			ignore: ['/memos'],
 		},
 	},
 
