@@ -2,7 +2,7 @@
 useHead({ title: '文章' })
 definePageMeta({ headerText: '最近更新' })
 
-const { data, error, status } = useLazyFetch('/api/feed/blog')
+const { data, status, refresh } = useLazyFetch('/api/feed/blog')
 
 const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </script>
@@ -15,15 +15,23 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 	</span>
 </ZTitle>
 
-<template v-if="status === 'pending'">
-	<p>加载中…</p>
-</template>
-<template v-else-if="status === 'error'">
-	<p>{{ error }}</p>
-</template>
+<p v-if="status === 'pending'" class="article-tip">
+	加载中…
+</p>
+
+<div v-else-if="status === 'error'" class="article-tip">
+	<p>文章加载失败，可能是网络不通。</p>
+	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
+</div>
+
+<p v-else-if="!articles.length" class="article-tip">
+	还没有文章。
+</p>
+
 <div v-else class="article-list">
 	<ZArticle v-for="article in articles" :key="article.id" v-bind="article" />
 </div>
+
 <div class="article-more">
 	<ZRawLink to="https://blog.shinya.click/">
 		<Icon name="ri:navigation-line" />
@@ -41,6 +49,16 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </template>
 
 <style lang="scss" scoped>
+.article-tip {
+	display: grid;
+	justify-items: center;
+	gap: 1rem;
+	margin: 2rem 0;
+	font-size: 0.9em;
+	text-align: center;
+	color: var(--c-text-3);
+}
+
 .article-list {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));

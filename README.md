@@ -4,13 +4,13 @@
 
 ## 数据源
 
-三个页面的内容都来自自建服务，全部客户端取数：
+三个页面的内容都来自自建服务，但取数方式不同：
 
-| 页面 | 源 |
-|---|---|
-| 项目 | `bonsai.shinya.click/api/projects` —— 项目聚合，不暴露仓库地址 |
-| 文章 | `blog.shinya.click/atom.xml`，经 `/api/feed/blog` 转成 JSON |
-| 碎语 | `memos.shinya.click/api/v1/memos` |
+| 页面 | 源 | 取数方式 |
+|---|---|---|
+| 项目 | `bonsai.shinya.click/api/projects` —— 项目聚合，不暴露仓库地址 | 客户端取数，内容实时 |
+| 文章 | `blog.shinya.click/atom.xml`，经 `/api/feed/blog` 转成 JSON | **构建期快照**——`/api/feed/blog` 在 `pnpm generate` 时预渲染成静态 JSON 并烘进 HTML，博客发了新文章要重新部署主页才会更新 |
+| 碎语 | `memos.shinya.click/api/v1/memos` | 客户端取数，内容实时 |
 
 碎语所在的 memos 服务用 Origin 白名单做 CORS，本站域名须在白名单内，否则该页为空。
 

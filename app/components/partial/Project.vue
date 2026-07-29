@@ -11,16 +11,19 @@ const ACTIVITY: Record<BonsaiActivity, { text: string, live: boolean }> = {
 	empty: { text: '空仓', live: false },
 }
 
-const activityInfo = computed(() => ACTIVITY[props.activity])
+// bonsai 是独立部署、独立演进的服务，前端和它之间没有编译期契约：
+// 拿到一个未映射的枚举值，或者字段整个缺失，都是现实会发生的事，
+// 不该让 activity/languages 兜不住而让整个 <main> 空白
+const activityInfo = computed(() => ACTIVITY[props.activity] ?? ACTIVITY.idle)
 
-const topLanguage = computed(() => props.stats.languages[0])
+const topLanguage = computed(() => props.stats?.languages?.[0])
 
 // star 少于 10 是噪音：blog 和 chisel 各 1 star，写出来毫无信息。
 // 阈值让 LunaTV(9158) 和 MYDB(1169) 自然获得小项目没有的视觉重量
-const showStars = computed(() => props.stats.stars >= 10)
+const showStars = computed(() => (props.stats?.stars ?? 0) >= 10)
 
 const languageTip = computed(() => ({
-	content: props.stats.languages
+	content: (props.stats?.languages ?? [])
 		.map(lang => `${lang.name} ${(lang.share * 100).toFixed(1)}%`)
 		.join(' · '),
 }))
@@ -75,7 +78,7 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 			{{ description }}
 		</p>
 
-		<p class="project-meta">
+		<p v-if="stats" class="project-meta">
 			<span v-if="topLanguage">{{ topLanguage.name }}</span>
 			<span>{{ stats.commits }} 提交</span>
 			<span v-if="stats.commitsLast7d">近 7 天 {{ stats.commitsLast7d }} 条</span>

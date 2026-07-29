@@ -9,7 +9,10 @@ const props = defineProps<{
 }>()
 
 const img = computed(() => {
-	if (props.img)
+	// 用 !== undefined 而不是真值判断：显式传入空字符串是「强制不出图」的
+	// 信号，跟没传（undefined）语义不同，真值判断会把两者混为一谈，
+	// 空字符串照样落到下面从 link 推导头像的分支
+	if (props.img !== undefined)
 		return props.img
 	const ghUsername = getGhUsername(props.link)
 	if (ghUsername)

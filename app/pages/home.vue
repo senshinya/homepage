@@ -51,7 +51,7 @@ const appConfig = useAppConfig()
 			本站基于
 			<ZLink to="https://github.com/L33Z22L11/homepage-v5" icon="ri:github-line">L33Z22L11/homepage-v5</ZLink>
 			改造，感谢
-			<ZBadge link="https://github.com/L33Z22L11" text="纸鹿本鹿" />
+			<ZBadge link="https://github.com/L33Z22L11" text="纸鹿本鹿" img="" />
 			把它开源出来。
 		</p>
 	</ZField>

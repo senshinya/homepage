@@ -147,6 +147,9 @@ const sidebarStore = useSidebarStore()
 
 	.nav-text {
 		flex-grow: 1;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.external-tip {
