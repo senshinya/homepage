@@ -7,7 +7,19 @@ export default antfu({
 	pnpm: true,
 	// @keep-sorted
 	rules: {
+		'yaml/indent': ['error', 2],
+	},
+}, {
+	files: ['**/*.json'],
+	// @keep-sorted
+	rules: {
 		'jsonc/indent': ['error', 2],
+		'style/eol-last': ['warn', 'never'],
+	},
+}, {
+	files: ['**/*.vue'],
+	// @keep-sorted
+	rules: {
 		'vue/block-lang': ['warn', {
 			script: { lang: ['ts', 'tsx'] },
 			style: { lang: ['scss'] },
@@ -18,11 +30,7 @@ export default antfu({
 			// @keep-sorted
 			externalIgnores: ['ZLink', 'ZRawLink'],
 		}],
-		'yaml/indent': ['error', 2],
 	},
 }, {
-	files: ['**/*.json'],
-	rules: {
-		'style/eol-last': ['warn', 'never'],
-	},
+	ignores: ['.superpowers/**', 'docs/superpowers/**', 'pnpm-workspace.yaml'],
 })

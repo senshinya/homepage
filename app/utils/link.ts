@@ -1,13 +1,15 @@
+const DOMAIN_RE = /^(?:https?:\/\/)?(?:www\.)?([^/:]+)/i
+const GH_USERNAME_RE = /github\.com\/([a-zA-Z0-9-]+)(?:\/[^/]+)?(\/?)$/
+
 export function getDomain(url: string) {
-	const match = url.match(/^(?:https?:\/\/)?(?:www\.)?([^/:]+)/i)
+	const match = url.match(DOMAIN_RE)
 	return match?.[1] ?? url
 }
 
 export function getGhUsername(url?: string) {
 	if (!url)
 		return ''
-	const usernameRagex = /github\.com\/([a-zA-Z0-9-]+)(?:\/[^/]+)?(\/?)$/
-	return url.match(usernameRagex)?.[1] ?? ''
+	return url.match(GH_USERNAME_RE)?.[1] ?? ''
 }
 
 export function getGhAvatar(name: string, options?: Record<string, any>) {
