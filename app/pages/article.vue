@@ -8,13 +8,6 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </script>
 
 <template>
-<ZTitle icon="👀">
-	<span class="badge-text">来自博客
-		<ZRawLink to="https://blog.shinya.click/"><mark>信也のブログ</mark></ZRawLink>
-		的文章
-	</span>
-</ZTitle>
-
 <p v-if="status === 'pending'" class="article-tip">
 	加载中…
 </p>
