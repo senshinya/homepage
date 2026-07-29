@@ -64,7 +64,18 @@ description: 重写，面向 SEO 的长描述
 - `fork` 数组（九个使用纸鹿主页的站点）整个删除 —— 那是他的社交关系
 - `nav` 重写为四项 + 社交组（GitHub `senshinya`、Telegram `senshinya`、邮箱）
 
-`public/icon.png` 是纸鹿的图标，需要使用者提供替换文件。在那之前 `favicon` 指向 `https://github.com/senshinya.png`，页面不会出现他的图标。
+### 站点图标
+
+`public/icon.png`（674B）是纸鹿的标记，替换为博客已有的那枚 —— 黑白线描的戴螺旋眼镜的头像，源文件在 `blog-clarity/public/icons/`：
+
+- `favicon.svg`（19.8KB）搬为 `public/icon.svg`，作为首选 `<link rel="icon">`。矢量在标签页任何缩放下都清楚
+- `favicon.png`（2400×2400，141KB）压到 512 见方后搬为 `public/icon.png`，作为不支持 SVG favicon 的回退。原尺寸当 favicon 过大
+
+主页与博客用同一枚标记。
+
+`favicon` 配置项在改造后喂两处：`nuxt.config.ts` 的 `<link rel="icon">`，以及 `routeRules` 里 `/favicon.ico` 与 `/api/icon.png` 两条重定向。原本的第三处 —— `ZhiluIcon.vue` 渲染在侧栏作者名左边的小 logo —— 随该组件一并删除，侧栏头部改渲染头像。
+
+`/api/icon.png` 与 `/api/avatar.png` 两条对外重定向**保留**。它们的用途是给别人的友链列表一个稳定 URL 去引用，免得盗链带 hash 的构建产物；只是两条 route rule，无维护成本。
 
 ## 侧边栏与路由
 
@@ -220,7 +231,8 @@ bonsai 的主题是**每项目一个字段**，默认 `paper`。使用者将四�
 1. **memos 的 CORS 放行 `https://shinya.click`** —— 改 memos 前面 Caddy 的 CORS 配置。当前只放行 `https://blog.shinya.click`，用其他 Origin 请求时响应里没有 `access-control-allow-origin`，浏览器直接拦截。**碎语页在此之前是空白的**
 2. **bonsai 后台把四个项目主题改为 `shore`**
 3. **bonsai 后台补 `description_override`** —— 现有四条描述中只有 MYDB 的「一个简单的数据库实现」可用；blog 是 `shinya.click comment`，chisel 为空，LunaTV 是一段 CC 协议声明。描述的真相应在 bonsai，不在主页硬编码
-4. **提供 `public/icon.png`**
+
+站点图标不在此列：源文件已在本机 `blog-clarity/public/icons/`，属实施范围内的工作，见「站点图标」。
 
 ## 已知限制与风险
 
