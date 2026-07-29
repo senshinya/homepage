@@ -55,6 +55,17 @@ export default defineNuxtConfig({
 
 	routeRules,
 
+	nitro: {
+		prerender: {
+			// 纯静态构建时 Nitro 不会自动产出这条 API 的 JSON——文章页用的是
+			// useLazyFetch，预渲染爬虫看不到这个请求。不显式列出的话
+			// .output/public/api/feed/blog 不存在，线上取数直接 404
+			routes: ['/api/feed/blog'],
+			crawlLinks: false,
+			failOnError: false,
+		},
+	},
+
 	vite: {
 		css: {
 			preprocessorOptions: {
