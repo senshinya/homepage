@@ -22,3 +22,5 @@ logs
 .env
 .env.*
 !.env.example
+# Vercel 构建产物（NITRO_PRESET=vercel 时生成）
+.vercel

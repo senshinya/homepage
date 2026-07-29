@@ -57,10 +57,18 @@ export default defineNuxtConfig({
 
 	nitro: {
 		prerender: {
-			// 纯静态构建时 Nitro 不会自动产出这条 API 的 JSON——文章页用的是
-			// useLazyFetch，预渲染爬虫看不到这个请求。不显式列出的话
-			// .output/public/api/feed/blog 不存在，线上取数直接 404
-			routes: ['/api/feed/blog'],
+			// 为了 /api/og 那个运行时端点，构建命令是 `nuxt build` 而不是 generate。
+			// 而 build 默认**不爬站**（generate 才默认爬），不在这里显式打开的话，
+			// 页面会全部从静态退化成按请求 SSR 的函数调用——这站除了 /api/og
+			// 之外没有一处需要运行时，全走函数纯属白白付出冷启动和调用计费
+			crawlLinks: true,
+			routes: [
+				// 爬虫的起点。generate 会自动补上 '/'，build 不会
+				'/',
+				// 文章页用的是 useLazyFetch，预渲染爬虫看不到这个请求。不显式列出
+				// 的话产物里 /api/feed/blog 不存在，线上取数直接 404
+				'/api/feed/blog',
+			],
 		},
 	},
 
