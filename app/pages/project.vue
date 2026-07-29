@@ -24,22 +24,56 @@ const projects = computed(() => data.value?.projects ?? [])
 </script>
 
 <template>
-<p v-if="loading">
-	加载中…
-</p>
+<!-- 骨架按 4:3 占位，否则盆栽到货时整页跳一次 -->
+<div v-if="loading" class="skeletons">
+	<div v-for="n in 3" :key="n" class="skeleton" />
+</div>
 
-<div v-else-if="error">
+<div v-else-if="error" class="project-tip">
 	<p>项目数据加载失败，可能是网络不通。</p>
 	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 </div>
 
-<p v-else-if="!projects.length">
+<p v-else-if="!projects.length" class="project-tip">
 	还没有项目。
 </p>
 
-<ol v-else>
-	<li v-for="project in projects" :key="project.slug">
-		{{ project.name }} · {{ project.activity }} · {{ project.stats.commits }} 提交
-	</li>
-</ol>
+<div v-else>
+	<ZProject v-for="project in projects" :key="project.slug" v-bind="project" />
+</div>
 </template>
+
+<style lang="scss" scoped>
+.skeletons {
+	display: grid;
+	gap: clamp(3rem, 10vh, 6rem);
+	margin: clamp(3rem, 10vh, 6rem) 0;
+}
+
+.skeleton {
+	width: min(100%, 55%);
+	aspect-ratio: 4 / 3;
+	border-radius: 8px;
+	background-color: var(--c-bg-1);
+
+	&:nth-child(even) {
+		margin-left: auto;
+	}
+
+	@media (max-width: $breakpoint-mobile) {
+		width: 100%;
+
+		&:nth-child(even) {
+			margin-left: 0;
+		}
+	}
+}
+
+.project-tip {
+	display: grid;
+	justify-items: start;
+	gap: 1rem;
+	margin: 3rem 0;
+	color: var(--c-text-2);
+}
+</style>
