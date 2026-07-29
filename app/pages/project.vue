@@ -44,15 +44,16 @@ const projects = computed(() => data.value?.projects ?? [])
 </template>
 
 <style lang="scss" scoped>
+// 骨架的尺寸和交错必须跟 ZProject 的画框一致，否则盆栽到货时整页跳一次
 .skeletons {
 	display: grid;
-	gap: clamp(3rem, 10vh, 6rem);
-	margin: clamp(3rem, 10vh, 6rem) 0;
+	gap: clamp(2rem, 6vh, 3.5rem);
+	margin: clamp(2rem, 6vh, 3.5rem) 0;
 }
 
 .skeleton {
-	width: min(100%, 55%);
-	aspect-ratio: 4 / 3;
+	width: clamp(200px, 26vw, 340px);
+	aspect-ratio: 3 / 2;
 	border-radius: 8px;
 	background-color: var(--c-bg-1);
 
