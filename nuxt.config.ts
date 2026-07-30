@@ -1,3 +1,5 @@
+import process from 'node:process'
+
 import homepageConfig, { routeRules } from './homepage.config'
 import packageJson from './package.json'
 
@@ -14,6 +16,13 @@ export default defineNuxtConfig({
 				{ name: 'color-scheme', content: 'light dark' },
 				{ 'name': 'generator', 'content': `${packageJson.name} ${packageJson.version}`, 'data-github-repo': packageJson.homepage },
 			],
+			script: process.env.VERCEL_ENV === 'production'
+				? [{
+						'defer': true,
+						'src': 'https://umami.shinya.click/script.js',
+						'data-website-id': 'bfb9e9fd-8090-4c1e-816c-c90b3daa060f',
+					}]
+				: [],
 			templateParams: {
 				separator: '|',
 			},

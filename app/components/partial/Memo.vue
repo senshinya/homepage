@@ -8,6 +8,12 @@ const props = defineProps<ParsedMemo>()
 const blogUrl = computed(() => `https://blog.shinya.click/memos/${props.id}`)
 
 const { open: openLightbox } = useLightbox()
+
+const settledImages = reactive(new Set<string>())
+
+function settleImage(src: string) {
+	settledImages.add(src)
+}
 </script>
 
 <template>
@@ -36,8 +42,20 @@ const { open: openLightbox } = useLightbox()
 		<ul v-if="images.length" class="memo-images">
 			<li v-for="(src, i) in images" :key="src">
 				<!-- 用 button 而不是给 img 挂 click：键盘要能 Tab 到并按回车打开 -->
-				<button type="button" aria-label="查看大图" @click="openLightbox(images, i)">
-					<NuxtImg :src="src" alt="" loading="lazy" />
+				<button
+					type="button"
+					:class="{ 'is-image-settled': settledImages.has(src) }"
+					:aria-busy="!settledImages.has(src)"
+					aria-label="查看大图"
+					@click="openLightbox(images, i)"
+				>
+					<NuxtImg
+						:src="src"
+						alt=""
+						loading="lazy"
+						@load="settleImage(src)"
+						@error="settleImage(src)"
+					/>
 				</button>
 			</li>
 		</ul>
@@ -203,24 +221,52 @@ const { open: openLightbox } = useLightbox()
 
 	button {
 		display: block;
+		position: relative;
 		overflow: hidden;
 		width: 100%;
 		border-radius: 6px;
+		background-color: var(--c-bg-1);
 		cursor: zoom-in;
+
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background-color: var(--c-bg-soft);
+			transition: opacity var(--motion-base) var(--ease-out);
+			animation: memo-image-skeleton 1.6s ease-in-out infinite;
+		}
+
+		&.is-image-settled::before {
+			opacity: 0;
+			animation: none;
+		}
 	}
 
 	img {
 		display: block;
+		position: relative;
+		opacity: 0;
 		width: 100%;
 		aspect-ratio: 1;
-		transition: scale var(--motion-panel) var(--ease-out);
+		transition: opacity var(--motion-base) var(--ease-out), scale var(--motion-panel) var(--ease-out);
 		object-fit: cover;
+	}
+
+	.is-image-settled > img {
+		opacity: 1;
 	}
 
 	@media (hover: hover) {
 		button:hover > img {
 			scale: 1.05;
 		}
+	}
+}
+
+@keyframes memo-image-skeleton {
+	50% {
+		opacity: 0.4;
 	}
 }
 
@@ -234,6 +280,10 @@ const { open: openLightbox } = useLightbox()
 
 	.memo-images img {
 		transition: none;
+	}
+
+	.memo-images button::before {
+		animation: none;
 	}
 
 	.memo-images button:hover > img {
