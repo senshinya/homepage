@@ -33,8 +33,6 @@ const colorMode = useColorMode()
 	background-color: var(--c-bg-2);
 
 	> button {
-		min-width: 40px;
-		min-height: 40px;
 		padding: 4px 1rem;
 		border-radius: 1rem;
 		transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);

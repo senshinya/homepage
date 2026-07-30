@@ -24,9 +24,20 @@ const projects = computed(() => data.value?.projects ?? [])
 </script>
 
 <template>
-<!-- 骨架按 4:3 占位，否则盆栽到货时整页跳一次 -->
-<div v-if="loading" class="skeletons">
-	<div v-for="n in 3" :key="n" class="skeleton" />
+<!-- 骨架复刻真实项目的两栏、交错和 3:2 图片，数据到货时位置不跳 -->
+<div v-if="loading" class="project-layout skeletons" aria-hidden="true">
+	<div v-for="n in 3" :key="n" class="skeleton">
+		<div class="skeleton-plate" />
+		<div class="skeleton-body">
+			<i class="skeleton-name" />
+			<i class="skeleton-description" />
+			<i class="skeleton-meta" />
+			<i class="skeleton-language" />
+			<div class="skeleton-logs">
+				<i v-for="line in 4" :key="line" />
+			</div>
+		</div>
+	</div>
 </div>
 
 <div v-else-if="error" class="project-tip">
@@ -38,34 +49,115 @@ const projects = computed(() => data.value?.projects ?? [])
 	还没有项目。
 </p>
 
-<div v-else>
+<div v-else class="project-layout">
 	<ZProject v-for="project in projects" :key="project.slug" v-bind="project" />
 </div>
 </template>
 
 <style lang="scss" scoped>
-// 骨架的尺寸和交错必须跟 ZProject 的画框一致，否则盆栽到货时整页跳一次
-.skeletons {
-	display: grid;
-	gap: clamp(2rem, 6vh, 3.5rem);
-	margin: clamp(2rem, 6vh, 3.5rem) 0;
+// 加载态和真实项目共同继承这四个几何值，避免两套布局分别演进后再次错位
+.project-layout {
+	--project-plate-w: clamp(200px, 26vw, 340px);
+	--project-text-w: minmax(0, 24rem);
+	--project-column-gap: clamp(4rem, 9vw, 8rem);
+	--project-row-margin: clamp(2rem, 6vh, 3.5rem);
+
+	@media (max-width: $breakpoint-mobile) {
+		--project-column-gap: 1rem;
+	}
 }
 
 .skeleton {
-	width: clamp(200px, 26vw, 340px);
-	aspect-ratio: 3 / 2;
-	border-radius: 8px;
-	background-color: var(--c-bg-1);
+	display: grid;
+	grid-template-columns: var(--project-plate-w) var(--project-text-w);
+	align-items: center;
+	justify-content: center;
+	gap: var(--project-column-gap);
+	margin: var(--project-row-margin) 0;
 
 	&:nth-child(even) {
-		margin-left: auto;
+		grid-template-columns: var(--project-text-w) var(--project-plate-w);
+
+		> .skeleton-plate {
+			order: 2;
+		}
 	}
 
 	@media (max-width: $breakpoint-mobile) {
-		width: 100%;
+		grid-template-columns: minmax(0, 1fr);
 
 		&:nth-child(even) {
-			margin-left: 0;
+			grid-template-columns: minmax(0, 1fr);
+
+			> .skeleton-plate {
+				order: 0;
+			}
+		}
+	}
+}
+
+.skeleton-plate {
+	width: 100%;
+	aspect-ratio: 3 / 2;
+	border-radius: 8px;
+	background-color: var(--c-bg-1);
+}
+
+.skeleton-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.6em;
+	min-width: 0;
+}
+
+.skeleton-name,
+.skeleton-description,
+.skeleton-meta,
+.skeleton-language,
+.skeleton-logs > i {
+	display: block;
+	border-radius: 0.3rem;
+	background-color: var(--c-bg-1);
+}
+
+.skeleton-name {
+	width: 42%;
+	height: 1.25rem;
+}
+
+.skeleton-description {
+	width: 92%;
+	height: 0.85rem;
+}
+
+.skeleton-meta {
+	width: 68%;
+	height: 0.7rem;
+}
+
+.skeleton-language {
+	width: 7rem;
+	height: 4px;
+}
+
+.skeleton-logs {
+	display: grid;
+	gap: 0.55rem;
+	margin-top: 0.2rem;
+
+	> i {
+		height: 0.7rem;
+
+		&:nth-child(2) {
+			width: 88%;
+		}
+
+		&:nth-child(3) {
+			width: 94%;
+		}
+
+		&:nth-child(4) {
+			width: 76%;
 		}
 	}
 }

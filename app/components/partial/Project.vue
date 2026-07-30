@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { BonsaiActivity, BonsaiProject } from '~/types/bonsai'
+import { normalizeLanguages } from '~/utils/languageColor'
 
 const props = defineProps<BonsaiProject>()
 
@@ -16,14 +17,15 @@ const ACTIVITY: Record<BonsaiActivity, { text: string, live: boolean }> = {
 // 不该让 activity/languages 兜不住而让整个 <main> 空白
 const activityInfo = computed(() => ACTIVITY[props.activity] ?? ACTIVITY.idle)
 
-const topLanguage = computed(() => props.stats?.languages?.[0])
+const languageSegments = computed(() => normalizeLanguages(props.stats?.languages ?? []))
+const topLanguage = computed(() => languageSegments.value[0])
 
 // star 少于 10 是噪音：blog 和 chisel 各 1 star，写出来毫无信息。
 // 阈值让 LunaTV(9158) 和 MYDB(1169) 自然获得小项目没有的视觉重量
 const showStars = computed(() => (props.stats?.stars ?? 0) >= 10)
 
-const languageSummary = computed(() => (props.stats?.languages ?? [])
-	.map(lang => `${lang.name} ${(lang.share * 100).toFixed(1)}%`)
+const languageSummary = computed(() => languageSegments.value
+	.map(language => `${language.name} ${language.normalizedPercentage.toFixed(1)}%`)
 	.join(' · '))
 const languageTip = computed(() => ({ content: languageSummary.value }))
 const languageLabel = computed(() => `语言占比：${languageSummary.value}`)
@@ -98,14 +100,22 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 		</p>
 
 		<div
-			v-if="topLanguage"
+			v-if="languageSegments.length"
 			v-tip="languageTip"
 			class="project-langs"
 			tabindex="0"
 			role="img"
 			:aria-label="languageLabel"
 		>
-			<i class="lang-top" :style="{ width: `${topLanguage.share * 100}%` }" />
+			<i
+				v-for="language in languageSegments"
+				:key="language.name"
+				class="lang-segment"
+				:style="{
+					flexGrow: language.normalizedShare,
+					backgroundColor: language.color,
+				}"
+			/>
 		</div>
 
 		<ol v-if="recentCommits.length" class="project-log" :class="{ truncated }">
@@ -127,19 +137,19 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 // 行不加边框阴影圆角——bonsai 不返回仓库地址，这些行没有可点的目标，
 // 卡片是导航语汇，用在点不进去的页面上是错的信号
 .project {
-	--plate-w: clamp(200px, 26vw, 340px);
-	--text-w: minmax(0, 24rem);
+	--plate-w: var(--project-plate-w, clamp(200px, 26vw, 340px));
+	--text-w: var(--project-text-w, minmax(0, 24rem));
 
 	display: grid;
 	grid-template-columns: var(--plate-w) var(--text-w);
-	align-items: start;
+	align-items: center;
 
-	// 整行贴左、偶数行贴右：交错发生在行与行之间。若改成把两栏推向两侧边缘，
-	// 行内会裂出一条两百多像素的死通道，正是要消掉的那种空
-	justify-content: start;
-	gap: clamp(1.2rem, 3vw, 2.5rem);
+	// 每行的两栏作为一个整体落在内容区中线；交错只交换图片和文字的位置，
+	// 不再把奇偶行分别推向两侧，否则每行的视觉中心会来回漂移
+	justify-content: center;
+	gap: var(--project-column-gap, clamp(4rem, 9vw, 8rem));
 	opacity: 0;
-	margin: clamp(2rem, 6vh, 3.5rem) 0;
+	margin: var(--project-row-margin, clamp(2rem, 6vh, 3.5rem)) 0;
 	transition: opacity var(--motion-slow) var(--ease-out), translate var(--motion-slow) var(--ease-out);
 	translate: 0 12px;
 
@@ -152,7 +162,6 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 	// 盆栽会被塞进为文字栏留的那一格，四棵树于是一行大一行小
 	&:nth-child(even) {
 		grid-template-columns: var(--text-w) var(--plate-w);
-		justify-content: end;
 
 		> .project-plate {
 			order: 2;
@@ -161,7 +170,7 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 
 	@media (max-width: $breakpoint-mobile) {
 		grid-template-columns: minmax(0, 1fr);
-		gap: 1rem;
+		gap: var(--project-column-gap, 1rem);
 
 		// 窄屏一律盆栽在上。交错在单列下没有意义，只会打乱阅读顺序
 		&:nth-child(even) {
@@ -278,24 +287,24 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 	}
 }
 
-// 只画首要语言一段，其余留底色。不做 GitHub 那种彩虹条——
-// 那会是这一页唯一破坏安静的东西。完整占比交给 tippy
+// 返回值只含前几种语言且总和可能不足 100%，脚本先重新归一化；这里按原顺序
+// 连续铺满，颜色取 Linguist，完整比例仍交给 tippy 和 aria-label
 .project-langs {
+	display: flex;
 	overflow: hidden;
 
 	// 整体缩尺后这条要一起收：铺满 384px 的高饱和色块会比项目名还抢眼，
 	// 而它承载的信息（首要语言）meta 行里已经写了名字，它只补一个占比
 	width: 7rem;
-	height: 3px;
+	height: 4px;
 	border-radius: 2px;
 	background-color: var(--c-border);
 	cursor: help;
 
-	> .lang-top {
-		display: block;
+	> .lang-segment {
+		flex-basis: 0;
 		height: 100%;
-		border-radius: 2px;
-		background-color: var(--c-primary);
+		min-width: 0;
 	}
 }
 
