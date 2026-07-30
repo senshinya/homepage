@@ -19,7 +19,6 @@ defineProps<{
 				</div>
 				<br>
 				<ZButton text="返回主页" @click="clearError({ redirect: '/' })" />
-				<ZButton text="尝试忽略" @click="clearError()" />
 			</ZField>
 		</div>
 	</main>

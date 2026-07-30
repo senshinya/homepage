@@ -55,7 +55,7 @@ const tip = computed(() => {
 	box-sizing: content-box;
 	background-color: var(--c-bg-2);
 	font-size: 0.875em;
-	transition: color 0.2s;
+	transition: color var(--motion-base) var(--ease-out);
 
 	@supports (color: color-mix(in srgb, transparent, transparent)) {
 		border-color: color-mix(in srgb, currentcolor 10%, transparent);
@@ -63,8 +63,14 @@ const tip = computed(() => {
 		color: color-mix(in srgb, currentcolor 80%, transparent);
 	}
 
-	&[href]:hover {
+	&[href]:focus-visible {
 		color: var(--c-text);
+	}
+
+	@media (hover: hover) {
+		&[href]:hover {
+			color: var(--c-text);
+		}
 	}
 
 	&.round, &.round > .badge-icon {

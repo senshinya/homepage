@@ -85,14 +85,22 @@ const thumbnail = computed(() => hasPreview.value
 	box-shadow: 0 0 0 1px var(--c-bg-soft);
 	font-size: 0.9em;
 	line-height: 1.4;
-	transition: box-shadow 0.2s, background-color 0.2s;
+	transition: box-shadow var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-	// 项目没有全局的 focus-visible 兜底，各组件自己管，故键盘态要一并写上，
-	// 否则 Tab 过来只剩浏览器默认轮廓
-	&:hover,
 	&:focus-visible {
 		box-shadow: 0 0 0 1px var(--c-primary);
 		background-color: var(--c-primary-soft);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			box-shadow: 0 0 0 1px var(--c-primary);
+			background-color: var(--c-primary-soft);
+		}
+	}
+
+	&:active {
+		transform: scale(0.99);
 	}
 }
 

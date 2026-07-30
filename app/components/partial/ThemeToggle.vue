@@ -4,12 +4,14 @@ const colorMode = useColorMode()
 </script>
 
 <template>
-<div class="theme-toggle">
+<div class="theme-toggle" role="group" aria-label="主题模式">
 	<button
 		v-for="(themeData, themeName) in appConfig.themes"
 		:key="themeName"
 		v-tip="themeData.tip"
+		type="button"
 		:aria-label="themeData.tip"
+		:aria-pressed="colorMode.preference === themeName"
 		:class="{ active: colorMode.preference === themeName }"
 		@click="colorMode.preference = themeName"
 	>
@@ -31,13 +33,21 @@ const colorMode = useColorMode()
 	background-color: var(--c-bg-2);
 
 	> button {
+		min-width: 40px;
+		min-height: 40px;
 		padding: 4px 1rem;
 		border-radius: 1rem;
-		transition: all 0.1s;
+		transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-		&:hover {
-			background-color: var(--c-bg-soft);
-			color: var(--c-text-1);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--c-bg-soft);
+				color: var(--c-text-1);
+			}
+		}
+
+		&:active:not(.active) {
+			transform: scale(0.96);
 		}
 
 		&.active {

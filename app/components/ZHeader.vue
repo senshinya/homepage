@@ -4,7 +4,14 @@ const sidebarStore = useSidebarStore()
 
 <template>
 <div id="z-header">
-	<button id="toggle-sidebar" aria-label="切换侧边栏" @click="sidebarStore.toggle">
+	<button
+		id="toggle-sidebar"
+		type="button"
+		aria-label="打开侧边栏"
+		aria-controls="z-sidebar"
+		:aria-expanded="sidebarStore.isOpen"
+		@click="sidebarStore.toggle"
+	>
 		<Icon name="ri:sidebar-unfold-line" />
 	</button>
 	<span class="header-text">{{ $route.meta.headerText }}</span>
@@ -32,16 +39,25 @@ const sidebarStore = useSidebarStore()
 
 #toggle-sidebar {
 	display: none;
-	padding: 0.2em;
-	border-radius: 0.2em;
+	place-items: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 0.4em;
 	font-size: 1.2em;
+	transition: background-color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-	&:hover {
-		background-color: var(--c-bg-soft);
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--c-bg-soft);
+		}
+	}
+
+	&:active {
+		transform: scale(0.96);
 	}
 
 	@media (max-width: $breakpoint-mobile) {
-		display: block;
+		display: grid;
 	}
 }
 </style>

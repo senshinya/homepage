@@ -7,12 +7,15 @@ export interface ButtonProps {
 	to?: string
 	desc?: string
 	primary?: boolean
+	type?: 'button' | 'submit' | 'reset'
 }
-defineProps<ButtonProps>()
+withDefaults(defineProps<ButtonProps>(), {
+	type: 'button',
+})
 </script>
 
 <template>
-<component :is="to ? ZRawLink : 'button'" :to class="button" :class="{ primary }">
+<component :is="to ? ZRawLink : 'button'" :to :type="to ? undefined : type" class="button" :class="{ primary }">
 	<div class="button-main">
 		<Icon v-if="icon" :name="icon" />
 		<slot>{{ text }}</slot>
@@ -25,7 +28,9 @@ defineProps<ButtonProps>()
 
 <style lang="scss" scoped>
 .button {
-	display: inline-block;
+	display: inline-grid;
+	align-content: center;
+	min-height: 40px;
 	padding: 0.4em 0.6em;
 	border: 1px solid var(--c-bg-soft);
 	border-radius: 0.5em;
@@ -33,7 +38,7 @@ defineProps<ButtonProps>()
 	background-color: var(--c-bg-1);
 	line-height: 1.2;
 	vertical-align: middle;
-	transition: filter 0.2s;
+	transition: filter var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 	cursor: pointer;
 
 	&.primary {
@@ -41,11 +46,14 @@ defineProps<ButtonProps>()
 		color: var(--c-bg);
 	}
 
-	&:hover {
-		filter: contrast(0.9);
+	@media (hover: hover) {
+		&:hover {
+			filter: contrast(0.9);
+		}
 	}
 
 	&:active {
+		transform: scale(0.97);
 		filter: contrast(0.8);
 	}
 

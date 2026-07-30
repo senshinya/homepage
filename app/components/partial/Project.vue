@@ -6,7 +6,7 @@ const props = defineProps<BonsaiProject>()
 const ACTIVITY: Record<BonsaiActivity, { text: string, live: boolean }> = {
 	active: { text: '活跃', live: true },
 	slowing: { text: '放缓', live: false },
-	idle: { text: '停更', live: false },
+	idle: { text: '近期无更新', live: false },
 	archived: { text: '已归档', live: false },
 	empty: { text: '空仓', live: false },
 }
@@ -22,11 +22,11 @@ const topLanguage = computed(() => props.stats?.languages?.[0])
 // 阈值让 LunaTV(9158) 和 MYDB(1169) 自然获得小项目没有的视觉重量
 const showStars = computed(() => (props.stats?.stars ?? 0) >= 10)
 
-const languageTip = computed(() => ({
-	content: (props.stats?.languages ?? [])
-		.map(lang => `${lang.name} ${(lang.share * 100).toFixed(1)}%`)
-		.join(' · '),
-}))
+const languageSummary = computed(() => (props.stats?.languages ?? [])
+	.map(lang => `${lang.name} ${(lang.share * 100).toFixed(1)}%`)
+	.join(' · '))
+const languageTip = computed(() => ({ content: languageSummary.value }))
+const languageLabel = computed(() => `语言占比：${languageSummary.value}`)
 
 // bonsai 每个项目都送来 9–10 条提交，之前只画 commits[0]，其余九条丢掉，
 // 文字栏却空着。排成 git log——填充物是现成的真数据，不用为了撑版面造话，
@@ -97,7 +97,14 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 			</span>
 		</p>
 
-		<div v-if="topLanguage" v-tip="languageTip" class="project-langs">
+		<div
+			v-if="topLanguage"
+			v-tip="languageTip"
+			class="project-langs"
+			tabindex="0"
+			role="img"
+			:aria-label="languageLabel"
+		>
 			<i class="lang-top" :style="{ width: `${topLanguage.share * 100}%` }" />
 		</div>
 
@@ -133,7 +140,7 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 	gap: clamp(1.2rem, 3vw, 2.5rem);
 	opacity: 0;
 	margin: clamp(2rem, 6vh, 3.5rem) 0;
-	transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	transition: opacity var(--motion-slow) var(--ease-out), translate var(--motion-slow) var(--ease-out);
 	translate: 0 12px;
 
 	&.seen {

@@ -42,11 +42,12 @@ function onKeydown(event: KeyboardEvent) {
 <dialog
 	ref="dialog"
 	class="lightbox"
+	aria-label="图片预览"
 	@close="onClose"
 	@click.self="close()"
 	@keydown="onKeydown"
 >
-	<img v-if="current" :src="current" alt="" @click="close()">
+	<img v-if="current" :src="current" :alt="`碎语配图 ${index + 1}`" @click="close()">
 
 	<div v-if="images.length > 1" class="lightbox-nav">
 		<button type="button" aria-label="上一张" @click="step(-1)">
@@ -110,30 +111,46 @@ function onKeydown(event: KeyboardEvent) {
 	font-variant-numeric: tabular-nums;
 
 	> button {
-		display: flex;
-		padding: 0.3rem;
+		display: grid;
+		place-items: center;
+		min-width: 40px;
+		min-height: 40px;
 		border-radius: 50%;
-		transition: background-color 0.2s;
+		transition: background-color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-		&:hover {
-			background-color: var(--c-bg-2);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--c-bg-2);
+			}
+		}
+
+		&:active {
+			transform: scale(0.94);
 		}
 	}
 }
 
 .lightbox-close {
-	display: flex;
+	display: grid;
+	place-items: center;
 	position: fixed;
 	top: clamp(0.5rem, 3vh, 1.5rem);
 	right: clamp(0.5rem, 3vw, 1.5rem);
-	padding: 0.4rem;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
 	background-color: var(--c-bg-1);
 	color: var(--c-text-2);
-	transition: background-color 0.2s;
+	transition: background-color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-	&:hover {
-		background-color: var(--c-bg-2);
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--c-bg-2);
+		}
+	}
+
+	&:active {
+		transform: scale(0.94);
 	}
 }
 </style>

@@ -71,23 +71,24 @@ const { open: openLightbox } = useLightbox()
 	font-size: 0.8em;
 	font-variant-numeric: tabular-nums;
 	color: var(--c-text-3);
-	transition: color 0.2s;
+	transition: color var(--motion-base) var(--ease-out);
 
 	@media (max-width: $breakpoint-mobile) {
+		align-items: center;
 		justify-content: flex-start;
+		min-height: 40px;
 		padding-top: 0;
 	}
 }
 
 // 日期是灰的、无下划线，不点一下看不出是链接。删掉「在博客查看」后它是
-// 唯一出站入口，所以悬停时必须给出可点的信号
+// 唯一出站入口。触屏没有 hover，箭头需常驻；有鼠标时再收起，悬停显示
 .memo-permalink {
-	opacity: 0;
+	opacity: 0.55;
 	font-size: 1em;
-	transition: opacity 0.2s;
+	transition: opacity var(--motion-base) var(--ease-out);
 }
 
-.memo:hover,
 .memo:focus-within {
 	> .memo-date {
 		color: var(--c-primary);
@@ -95,6 +96,22 @@ const { open: openLightbox } = useLightbox()
 
 	.memo-permalink {
 		opacity: 1;
+	}
+}
+
+@media (hover: hover) {
+	.memo-permalink {
+		opacity: 0;
+	}
+
+	.memo:hover {
+		> .memo-date {
+			color: var(--c-primary);
+		}
+
+		.memo-permalink {
+			opacity: 1;
+		}
 	}
 }
 
@@ -181,12 +198,14 @@ const { open: openLightbox } = useLightbox()
 		display: block;
 		width: 100%;
 		aspect-ratio: 1;
-		transition: scale 0.3s;
+		transition: scale var(--motion-panel) var(--ease-out);
 		object-fit: cover;
 	}
 
-	button:hover > img {
-		scale: 1.05;
+	@media (hover: hover) {
+		button:hover > img {
+			scale: 1.05;
+		}
 	}
 }
 

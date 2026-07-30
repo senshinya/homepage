@@ -34,4 +34,9 @@ useSeoMeta({
 		}
 	}
 }
+
+body.sidebar-open,
+body.sidebar-open #z-root > .content {
+	overflow: hidden;
+}
 </style>

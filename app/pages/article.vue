@@ -13,7 +13,7 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </p>
 
 <div v-else-if="status === 'error'" class="article-tip">
-	<p>文章加载失败，可能是网络不通。</p>
+	<p>暂时没取到文章，请稍后重试。</p>
 	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 </div>
 
@@ -28,7 +28,7 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 <div class="article-more">
 	<ZRawLink to="https://blog.shinya.click/">
 		<Icon name="ri:navigation-line" />
-		<span>访问</span>
+		<span>全部文章</span>
 	</ZRawLink>
 	<ZRawLink to="https://blog.shinya.click/link">
 		<Icon name="ri:link-m" />
@@ -71,15 +71,25 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 		align-items: center;
 		justify-content: center;
 		gap: 8px;
-		opacity: 0.2;
 		padding: 0.3em 0.5em;
 		border-radius: 8px;
-		transition: all 0.2s;
+		color: var(--c-text-3);
+		transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-		&:hover {
-			opacity: 1;
+		&:focus-visible {
 			background-color: var(--c-primary-soft);
 			color: var(--c-primary);
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--c-primary-soft);
+				color: var(--c-primary);
+			}
+		}
+
+		&:active {
+			transform: scale(0.98);
 		}
 	}
 }

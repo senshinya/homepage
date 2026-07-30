@@ -41,7 +41,7 @@ const parsedMemos = computed(() => memos.value.map(parseMemo))
 	</p>
 
 	<div v-else-if="error" class="memo-tip">
-		<p>碎语加载失败，可能是网络不通。</p>
+		<p>暂时没取到碎语，请稍后重试。</p>
 		<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 	</div>
 
@@ -88,10 +88,16 @@ const parsedMemos = computed(() => memos.value.map(parseMemo))
 	margin-left: calc(var(--memo-rail-col) + var(--memo-rail-gap) * 2 + 1px);
 	font-size: 0.85em;
 	color: var(--c-text-3);
-	transition: color 0.2s;
+	transition: color var(--motion-base) var(--ease-out);
 
-	&:hover {
+	&:focus-visible {
 		color: var(--c-primary);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			color: var(--c-primary);
+		}
 	}
 
 	@media (max-width: $breakpoint-mobile) {

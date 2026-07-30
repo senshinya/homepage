@@ -30,7 +30,7 @@ const projects = computed(() => data.value?.projects ?? [])
 </div>
 
 <div v-else-if="error" class="project-tip">
-	<p>项目数据加载失败，可能是网络不通。</p>
+	<p>暂时没取到项目数据，请稍后重试。</p>
 	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 </div>
 

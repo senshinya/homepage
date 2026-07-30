@@ -1,6 +1,11 @@
 :root {
 	--font-family: "InterVariable", "Noto Sans SC", system-ui, sans-serif;
 	--font-monospace: ui-monospace, "JetBrains Mono", "Cascadia Code", "Consolas", "monospace", var(--font-family), monospace;
+	--motion-fast: 0.12s;
+	--motion-base: 0.18s;
+	--motion-panel: 0.24s;
+	--motion-slow: 0.5s;
+	--ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
 	overflow-wrap: break-word;
 	background-color: var(--c-bg);
@@ -9,7 +14,7 @@
 	text-autospace: normal;
 	text-size-adjust: none;
 	color: var(--c-text-1);
-	transition: color 0.1s, background-color 0.2s;
+	transition: color var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out);
 	scrollbar-color: var(--c-text-3) var(--c-bg-2);
 	font-variant-alternates: styleset(open-digits, disambiguation, round-quotes-and-commas);
 }
@@ -32,6 +37,7 @@ a {
 	text-decoration: none;
 	color: inherit;
 	-webkit-tap-highlight-color: var(--c-primary-soft);
+	touch-action: manipulation;
 }
 
 code, pre {
@@ -46,10 +52,16 @@ menu, ol, ul {
 
 button {
 	cursor: pointer;
+	touch-action: manipulation;
 
 	.iconify:only-child {
 		display: block;
 	}
+}
+
+:where(a, button, [tabindex]):focus-visible {
+	outline: 2px solid var(--c-primary);
+	outline-offset: 2px;
 }
 
 button, input, textarea {
@@ -74,15 +86,17 @@ mark {
 	background: linear-gradient(var(--c-primary-soft), var(--c-primary-soft)) no-repeat left bottom / 100% 0.3em;
 	text-decoration: none;
 	color: var(--c-primary);
-	transition: 0.2s;
-	animation: line-spread 0.5s;
+	transition: background-size var(--motion-base) var(--ease-out);
+	animation: line-spread var(--motion-slow) var(--ease-out);
 
 	@keyframes line-spread {
 		from { background-size: 0 0.3em; }
 	}
 
-	&:hover {
-		background-size: 100% 50%;
+	@media (hover: hover) {
+		&:hover {
+			background-size: 100% 50%;
+		}
 	}
 }
 
@@ -118,4 +132,20 @@ mark {
 .wrapper {
 	max-width: 768px;
 	margin: 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-fast: 0.01ms;
+		--motion-base: 0.01ms;
+		--motion-panel: 0.01ms;
+		--motion-slow: 0.01ms;
+	}
+
+	*,
+	::before,
+	::after {
+		animation-iteration-count: 1;
+		scroll-behavior: auto;
+	}
 }

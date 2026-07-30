@@ -23,10 +23,20 @@ defineProps<FeedProps>()
 .article-card {
 	padding: 8px;
 	border-radius: 8px;
-	transition: all 0.2s;
+	transition: background-color var(--motion-base) var(--ease-out), transform var(--motion-fast) var(--ease-out);
 
-	&:hover {
+	&:focus-visible {
 		background-color: var(--c-bg-soft);
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--c-bg-soft);
+		}
+	}
+
+	&:active {
+		transform: scale(0.99);
 	}
 
 	>* {
