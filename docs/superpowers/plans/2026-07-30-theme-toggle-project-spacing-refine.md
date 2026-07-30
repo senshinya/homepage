@@ -20,11 +20,15 @@
 Append this test to `tests/refine.test.mjs`:
 
 ```js
-test('theme toggle stays compact and project columns use the approved alignment and gap', () => {
+test('theme toggle stays compact', () => {
 	const themeToggle = read('app/components/partial/ThemeToggle.vue')
-	const project = read('app/components/partial/Project.vue')
 
 	assert.doesNotMatch(themeToggle, /min-(?:width|height):\s*40px/)
+})
+
+test('project columns use the approved alignment and responsive gap', () => {
+	const project = read('app/components/partial/Project.vue')
+
 	assert.match(project, /grid-template-columns:\s*var\(--plate-w\) var\(--text-w\);\s+align-items:\s*center;/)
 	assert.match(project, /justify-content:\s*start;\s+gap:\s*clamp\(2rem, 5vw, 4rem\);/)
 	assert.match(project, /@media \(max-width:\s*\$breakpoint-mobile\)\s*\{[\s\S]*?gap:\s*1rem;/)
@@ -39,7 +43,7 @@ Run:
 node --test tests/refine.test.mjs
 ```
 
-Expected: one new test fails because `ThemeToggle.vue` still contains the 40px minimum dimensions and `Project.vue` still uses top alignment with the old gap.
+Expected: both new tests fail: `ThemeToggle.vue` still contains the 40px minimum dimensions, while `Project.vue` still uses top alignment with the old gap.
 
 ### Task 2: Apply the minimal style changes
 
