@@ -141,6 +141,20 @@ test('unexpected errors lead with plain copy and disclose technical details on d
 	assert.doesNotMatch(errorPage, /class="error-message"/)
 })
 
+test('404 backdrop stays anchored near the initial viewport top', () => {
+	const errorPage = read('app/error.vue')
+	const stageStyles = errorPage.slice(errorPage.indexOf('.stage {'), errorPage.indexOf('.stage-mark {'))
+	const markStyles = errorPage.slice(errorPage.indexOf('.stage-mark {'), errorPage.indexOf('.lost-lead {'))
+
+	assert.match(stageStyles, /position:\s*relative/)
+	assert.match(stageStyles, />\s*:not\(\.stage-mark\)\s*\{[\s\S]*?grid-area:\s*stack/)
+	assert.match(markStyles, /position:\s*absolute/)
+	assert.match(markStyles, /inset-block-start:\s*0/)
+	assert.match(markStyles, /inset-inline-start:\s*50%/)
+	assert.match(markStyles, /transform:\s*translateX\(-50%\)/)
+	assert.doesNotMatch(markStyles, /place-self:/)
+})
+
 test('memo and lightbox controls remain discoverable on touch screens', () => {
 	const memo = read('app/components/partial/Memo.vue')
 	const lightbox = read('app/components/partial/Lightbox.vue')

@@ -118,9 +118,8 @@ main {
  * 用 min-height 而非 height，内容长过一屏时照样能往下长；扣掉的 5rem 是页头（48px）
  * 加 main 的上下留白（各 1rem），不扣的话这块会被顶出屏幕、白白多出一条滚动条。
  *
- * 底纹和内容叠在同一格里（都指到 stack），而不是拿 position: absolute 钉在舞台上。
- * 舞台是整屏高的，内容却垂直居中——钉在舞台顶上，窄屏时两者之间会空出一大条。
- * 同格叠放则它们永远一起动。
+ * 正文继续放在居中的 stack 轨道里；底纹则以舞台自身为定位上下文，不参与轨道尺寸。
+ * 这样卡片和推荐列表展开时只改变正文高度，不会再把底纹一起拖动。
  */
 .stage {
 	display: grid;
@@ -130,11 +129,12 @@ main {
 	// 于是正文也被一起拉宽、冲出版心。minmax(0, 1fr) 让轨道等于容器，底纹只是溢出它
 	grid-template-columns: minmax(0, 1fr);
 	align-content: center;
+	position: relative;
 	min-height: calc(100dvh - 5rem);
 	max-width: 42rem;
 	margin-inline: auto;
 
-	> * {
+	> :not(.stage-mark) {
 		grid-area: stack;
 	}
 }
@@ -157,16 +157,17 @@ main {
  * overflow: auto 的滚动容器，横向一溢出就会凭空多出一条滚动条。
  */
 .stage-mark {
-	// 对齐内容块顶边，再上提自身的一半：上半截浮在内容之上的空处，只有下半截压进
-	// 正文里。整字仍是完整的，越往下文字越密的那一段也就碰不到它
-	place-self: start center;
+	// 舞台本身已经从页头下方开始；贴住舞台顶边即可靠近首屏顶部，同时保留自然留白
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 50%;
 	font-size: clamp(12rem, 40vw, 30rem);
 	font-weight: 800;
 	letter-spacing: -0.05em;
 	line-height: 0.75;
 	color: transparent;
 	-webkit-text-stroke: 0.012em color-mix(in srgb, var(--c-bg-soft) 50%, transparent);
-	transform: translateY(-50%);
+	transform: translateX(-50%);
 	pointer-events: none;
 	user-select: none;
 	z-index: -1;
