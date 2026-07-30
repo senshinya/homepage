@@ -52,7 +52,22 @@ const { open: openLightbox } = useLightbox()
 .memo {
 	display: grid;
 	grid-template-columns: 5rem minmax(0, 1fr);
+
+	// 逐条升起，同 ZProject 的画框：.seen 由 memos.vue 的 useRevealStagger 统一发，
+	// 错开的延迟以内联 transition-delay 的形式落在这个元素上。
+	// 位移只给 8px，比项目页那处的 12px 短——轨道线是每条自己的 border-left 接起来
+	// 的，相邻两条错开多少，线就断开多少。12px 配 55ms 的步子最糟会豁出六个多像素，
+	// 一条一像素的细线断成那样很显眼；8px 实测最大豁口 4.23px，只出现在起跑后 55ms
+	// 那一瞬，加上相邻动画重叠九成，看着仍是一条连续的线在往下淌
 	gap: 0 1.2rem;
+	opacity: 0;
+	transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), translate 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+	translate: 0 8px;
+
+	&.seen {
+		opacity: 1;
+		translate: none;
+	}
 
 	@media (max-width: $breakpoint-mobile) {
 		grid-template-columns: minmax(0, 1fr);
@@ -210,6 +225,13 @@ const { open: openLightbox } = useLightbox()
 }
 
 @media (prefers-reduced-motion: reduce) {
+	// 起手就是终态。只关 transition 不改 opacity 的话，.seen 到来之前整列是隐形的
+	.memo {
+		opacity: 1;
+		transition: none;
+		translate: none;
+	}
+
 	.memo-images img {
 		transition: none;
 	}

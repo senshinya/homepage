@@ -10,7 +10,7 @@
 |---|---|---|
 | 项目 | `bonsai.shinya.click/api/projects` —— 项目聚合，不暴露仓库地址 | 客户端取数，内容实时 |
 | 文章 | `blog.shinya.click/atom.xml`，经 `/api/feed/blog` 转成 JSON | **构建期快照**——`/api/feed/blog` 在构建时预渲染成静态 JSON 并烘进 HTML，博客发了新文章要重新部署主页才会更新 |
-| 碎语 | `memos.shinya.click/api/v1/memos` | 客户端取数，内容实时；**只取首页 20 条**，更早的引去博客 |
+| 碎语 | `memos.shinya.click/api/v1/memos` | 客户端取数，内容实时；**只取首页 10 条**，更早的引去博客 |
 
 碎语所在的 memos 服务用 Origin 白名单做 CORS，本站域名须在白名单内，否则该页为空。开发时若用 `--host` 起局域网地址访问，那个 `http://<局域网 IP>:3000` 也得在白名单里——Origin 是 IP 而不是 localhost。
 

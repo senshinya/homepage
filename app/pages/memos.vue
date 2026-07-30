@@ -13,7 +13,7 @@ const MEMOS_API = 'https://memos.shinya.click/api/v1/memos'
 // 只取首页，不做翻页。主页这一栏是「最近在想什么」的橱窗，不是碎语的全量档案——
 // 全量在博客那边，那里有详情页、评论和反应，翻页也该发生在那里。
 // 一个页面只该有一个归宿，两边都能无限往下翻只会让人不知道该收藏哪个
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 const BLOG_MEMOS_URL = 'https://blog.shinya.click/memos'
 
 const memos = ref<Memo[]>([])
@@ -30,6 +30,12 @@ const { status, error, refresh } = useLazyAsyncData('memos', async () => {
 const loading = computed(() => status.value === 'idle' || status.value === 'pending')
 
 const parsedMemos = computed(() => memos.value.map(parseMemo))
+
+// 逐条升起。取数回来时十条一次性砸下来，是全站最硬的一记「啪」。
+// 条目又小又密，首屏能站下六七条，故步子要小：55ms 下相邻两条的动画重叠九成，
+// 读起来是一道往下淌的波，而不是六七个各跳各的
+const list = useTemplateRef<HTMLElement>('list')
+useRevealStagger(list, { step: 55 })
 </script>
 
 <template>
@@ -41,7 +47,7 @@ const parsedMemos = computed(() => memos.value.map(parseMemo))
 	</p>
 
 	<div v-else-if="error" class="memo-tip">
-		<p>暂时没取到碎语，请稍后重试。</p>
+		<p>碎语暂时加载失败，请稍后重试。</p>
 		<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 	</div>
 
@@ -50,7 +56,7 @@ const parsedMemos = computed(() => memos.value.map(parseMemo))
 	</p>
 
 	<template v-else>
-		<ol class="memo-list">
+		<ol ref="list" class="memo-list">
 			<ZMemo v-for="memo in parsedMemos" :key="memo.id" v-bind="memo" />
 		</ol>
 
@@ -58,7 +64,7 @@ const parsedMemos = computed(() => memos.value.map(parseMemo))
 			「换个地方接着看」，两者该长得不一样。对齐到正文栏，读起来像时间线
 			本身继续往博客延伸，而不是页脚上贴了个链接 -->
 		<ZRawLink class="memo-tail" :to="BLOG_MEMOS_URL">
-			更早的碎语在博客
+			去博客看更早的碎语
 			<Icon name="ri:arrow-right-line" />
 		</ZRawLink>
 

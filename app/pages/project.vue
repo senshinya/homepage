@@ -21,6 +21,12 @@ const loading = computed(() => status.value === 'idle' || status.value === 'pend
 // 顺序的真相在 bonsai：它已经按 sort ASC, last_commit_at DESC, id ASC 排好，
 // 而 sort 是后台可编辑的字段。前端再排一遍只会分裂成两处真相
 const projects = computed(() => data.value?.projects ?? [])
+
+// 逐行升起。一个 observer 管整列，同一帧进视口的几行才能错开先后——
+// 每行各挂一个的话它们只会一起亮。项目行又高又少，一屏顶多两三行，
+// 故步子迈得比碎语大，档位也用不上几档
+const list = useTemplateRef<HTMLElement>('list')
+useRevealStagger(list, { step: 90, cap: 3 })
 </script>
 
 <template>
@@ -41,7 +47,7 @@ const projects = computed(() => data.value?.projects ?? [])
 </div>
 
 <div v-else-if="error" class="project-tip">
-	<p>暂时没取到项目数据，请稍后重试。</p>
+	<p>项目暂时加载失败，请稍后重试。</p>
 	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 </div>
 
@@ -49,7 +55,7 @@ const projects = computed(() => data.value?.projects ?? [])
 	还没有项目。
 </p>
 
-<div v-else class="project-layout">
+<div v-else ref="list" class="project-layout">
 	<ZProject v-for="project in projects" :key="project.slug" v-bind="project" />
 </div>
 </template>

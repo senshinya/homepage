@@ -4,7 +4,7 @@ definePageMeta({ headerText: '最近更新' })
 
 const { data, status, refresh } = useLazyFetch('/api/feed/blog')
 
-const articles = computed(() => data.value?.slice(0, 8) ?? [])
+const articles = computed(() => data.value?.posts?.slice(0, 8) ?? [])
 </script>
 
 <template>
@@ -13,7 +13,7 @@ const articles = computed(() => data.value?.slice(0, 8) ?? [])
 </p>
 
 <div v-else-if="status === 'error'" class="article-tip">
-	<p>暂时没取到文章，请稍后重试。</p>
+	<p>文章暂时加载失败，请稍后重试。</p>
 	<ZButton icon="ri:refresh-line" text="重试" @click="refresh()" />
 </div>
 

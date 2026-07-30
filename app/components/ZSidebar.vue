@@ -75,6 +75,7 @@ useHead(() => ({
 					<ZRawLink
 						v-slot="{ external }"
 						:to="item.url"
+						:title="item.title"
 						class="aside-nav-item"
 						@click="closeSidebar(drawerOpen)"
 					>

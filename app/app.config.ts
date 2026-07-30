@@ -5,6 +5,8 @@ import homepageConfig from '~~/homepage.config'
 // 图标查询：https://yesicon.app/ph
 // 图标插件：https://marketplace.visualstudio.com/items?itemName=antfu.iconify
 
+const { email } = homepageConfig.author
+
 // @keep-sorted
 export default defineAppConfig({
 	...homepageConfig,
@@ -29,7 +31,12 @@ export default defineAppConfig({
 			items: [
 				{ icon: 'ri:github-line', text: 'senshinya', url: 'https://github.com/senshinya' },
 				{ icon: 'ri:telegram-line', text: 'senshinya', url: 'https://telegram.me/senshinya' },
-				{ icon: 'ri:mail-line', text: 'kobayashi_shinya@outlook.com', url: 'mailto:kobayashi_shinya@outlook.com' },
+				// 只印 @ 前面那截。整条地址要 217px，侧栏给文字的只有 136px，印全了必被切成
+				// 「kobayashi_shinya@ou…」——省略号吃掉的恰好是域名，剩下的既不好看也不能用。
+				// 同组另外两行本来印的也是「你在那边叫什么」而不是完整地址（github 那行没写
+				// github.com/senshinya），印全址的邮箱才是不合群的那个。域名交给 title 和
+				// mailto 兜着：悬停看得到，点下去自动填好
+				{ icon: 'ri:mail-line', text: email.replace(/@.*$/, ''), title: email, url: `mailto:${email}` },
 			],
 		},
 	] satisfies Nav,

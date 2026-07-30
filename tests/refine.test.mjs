@@ -94,6 +94,53 @@ test('theme and project metadata expose state to keyboard and assistive technolo
 	assert.match(button, /type:\s*'button'/)
 })
 
+test('project commit counters use occurrences', () => {
+	const project = read('app/components/partial/Project.vue')
+
+	assert.match(project, /<span>\{\{ stats\.commits \}\} 次提交<\/span>/)
+	assert.match(project, /近 7 天 \{\{ stats\.commitsLast7d \}\} 次/)
+	assert.doesNotMatch(project, /\{\{ stats\.commits \}\} 提交/)
+	assert.doesNotMatch(project, /近 7 天 \{\{ stats\.commitsLast7d \}\} 条/)
+})
+
+test('loading failures use familiar page language', () => {
+	const article = read('app/pages/article.vue')
+	const project = read('app/pages/project.vue')
+	const memos = read('app/pages/memos.vue')
+
+	assert.match(article, /文章暂时加载失败，请稍后重试。/)
+	assert.match(project, /项目暂时加载失败，请稍后重试。/)
+	assert.match(memos, /碎语暂时加载失败，请稍后重试。/)
+	assert.doesNotMatch(`${article}${project}${memos}`, /暂时没取到/)
+})
+
+test('memos requests only the ten most recent entries', () => {
+	const memos = read('app/pages/memos.vue')
+
+	assert.match(memos, /const PAGE_SIZE = 10/)
+	assert.match(memos, /query: \{ pageSize: PAGE_SIZE \}/)
+})
+
+test('legacy routes name their destination without insider shorthand', () => {
+	const moved = read('app/components/partial/Moved.vue')
+	const memos = read('app/pages/memos.vue')
+
+	assert.match(moved, /这个标签不再单独成页/)
+	assert.match(moved, /关于页已合并到主页/)
+	assert.match(moved, /你现在看到的就是新的关于页。/)
+	assert.match(moved, /这个链接可能不完整，也可能文章已经撤下了。/)
+	assert.match(memos, />\s*去博客看更早的碎语\s*</)
+	assert.doesNotMatch(moved, /标签页一并取消了|关于页并到了这里|这个站本身就是那一页|链接抄漏了一截/)
+})
+
+test('unexpected errors lead with plain copy and disclose technical details on demand', () => {
+	const errorPage = read('app/error.vue')
+
+	assert.match(errorPage, /页面暂时无法打开，请稍后重试。/)
+	assert.match(errorPage, /<details v-if="error\?\.message" class="error-details">[\s\S]*?<summary>查看错误详情<\/summary>[\s\S]*?<pre>\{\{ error\?\.message \}\}<\/pre>[\s\S]*?<\/details>/)
+	assert.doesNotMatch(errorPage, /class="error-message"/)
+})
+
 test('memo and lightbox controls remain discoverable on touch screens', () => {
 	const memo = read('app/components/partial/Memo.vue')
 	const lightbox = read('app/components/partial/Lightbox.vue')

@@ -1,6 +1,22 @@
 :root {
 	--font-family: "InterVariable", "Noto Sans SC", system-ui, sans-serif;
-	--font-monospace: ui-monospace, "JetBrains Mono", "Cascadia Code", "Consolas", "monospace", var(--font-family), monospace;
+
+	/*
+	 * 等宽栈。原来那条整条都落在 Inter 上，两个独立的坑叠在一起：
+	 *
+	 * 一、`"monospace"` 带了引号。引号里的是**字体名**而不是通用族关键字，系统上没有
+	 *    哪个字体叫这个名字，这一项等于空。加上 ui-monospace 在部分 Chrome 上也不解析
+	 *    （实测 iiii/MMMM = 16.39/56.45，比例字宽），前四项可以全部落空。
+	 *
+	 * 二、末尾的 var(--font-family) 展开后以 sans-serif 收尾。通用族**必定命中**，
+	 *    于是它后面那个真正的 monospace 关键字永远轮不到，整条栈稳稳停在比例字上。
+	 *
+	 * 现在：偏好的三款排前面，后面补上各平台一定装了的那个（macOS 的 Menlo、
+	 * Linux 的 Liberation Mono，Windows 由 Consolas 兜着）——这一层才是真正保底的，
+	 * ui-monospace 靠不住。中日文字形所有等宽字体都没有，留 Noto Sans SC 接着，
+	 * 与 --font-family 的取向一致；通用族关键字放最后，不带引号。
+	 */
+	--font-monospace: ui-monospace, "JetBrains Mono", "Cascadia Code", "Consolas", "Menlo", "Liberation Mono", "Noto Sans SC", monospace;
 	--motion-fast: 0.12s;
 	--motion-base: 0.18s;
 	--motion-panel: 0.24s;

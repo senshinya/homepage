@@ -48,20 +48,12 @@ function otherAuthor(author?: string) {
 	return author && author !== 'shinya' ? author : undefined
 }
 
-// 整行进入视口时升起一次。用 IntersectionObserver 而不是 CSS 滚动动画，
-// 是为了 stop() 掉之后不再回退——来回滚动时反复播放很烦
-const row = useTemplateRef('row')
-const seen = ref(false)
-const { stop } = useIntersectionObserver(row, ([entry]) => {
-	if (entry?.isIntersecting) {
-		seen.value = true
-		stop()
-	}
-}, { threshold: 0.15 })
+// 升起动画的触发不在这里：.seen 由父级的 useRevealStagger 统一发，一个 observer
+// 管整列。每行各挂一个的话，同一帧进视口的几行会一起亮，错不开先后
 </script>
 
 <template>
-<article ref="row" class="project" :class="{ seen }">
+<article class="project">
 	<div class="project-plate">
 		<img
 			v-if="svg"
@@ -92,8 +84,8 @@ const { stop } = useIntersectionObserver(row, ([entry]) => {
 
 		<p v-if="stats" class="project-meta">
 			<span v-if="topLanguage">{{ topLanguage.name }}</span>
-			<span>{{ stats.commits }} 提交</span>
-			<span v-if="stats.commitsLast7d">近 7 天 {{ stats.commitsLast7d }} 条</span>
+			<span>{{ stats.commits }} 次提交</span>
+			<span v-if="stats.commitsLast7d">近 7 天 {{ stats.commitsLast7d }} 次</span>
 			<span v-if="showStars" class="stars">
 				<Icon name="ri:star-line" />{{ stats.stars }}
 			</span>
