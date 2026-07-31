@@ -108,14 +108,14 @@ git diff HEAD
 
 Expected: no whitespace errors; only the approved feed metadata, regression test, and plan are present.
 
-- [ ] **Step 4: Commit the implementation**
+- [x] **Step 4: Commit the implementation**
 
 ```sh
 git add homepage.config.ts tests/refine.test.mjs docs/superpowers/plans/2026-07-31-feed-json-content-type-fix.md
 git commit -m "fix: serve prerendered blog feed as JSON"
 ```
 
-- [ ] **Step 5: Push the current branch**
+- [x] **Step 5: Push the current branch**
 
 ```sh
 git push origin senshinya/ux-copy-audit-homepage
