@@ -133,6 +133,12 @@ test('legacy routes name their destination without insider shorthand', () => {
 	assert.doesNotMatch(moved, /标签页一并取消了|关于页并到了这里|这个站本身就是那一页|链接抄漏了一截/)
 })
 
+test('prerendered blog feed is served as JSON', () => {
+	const config = read('homepage.config.ts')
+
+	assert.match(config, /'\/api\/feed\/blog':\s*\{\s*headers:\s*\{\s*'Content-Type':\s*'application\/json; charset=utf-8'/)
+})
+
 test('unexpected errors lead with plain copy and disclose technical details on demand', () => {
 	const errorPage = read('app/error.vue')
 

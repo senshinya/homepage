@@ -24,6 +24,7 @@ const homepageConfig = {
 // https://nitro.build/config#routerules
 export const routeRules: NitroConfig['routeRules'] = {
 	'/api/avatar.png': { redirect: author.avatar },
+	'/api/feed/blog': { headers: { 'Content-Type': 'application/json; charset=utf-8' } },
 	'/api/icon.png': { redirect: '/icon.png' },
 	'/favicon.ico': { redirect: homepageConfig.favicon },
 }
