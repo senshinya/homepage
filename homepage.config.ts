@@ -27,6 +27,13 @@ export const routeRules: NitroConfig['routeRules'] = {
 	'/api/feed/blog': { headers: { 'Content-Type': 'application/json; charset=utf-8' } },
 	'/api/icon.png': { redirect: '/icon.png' },
 	'/favicon.ico': { redirect: homepageConfig.favicon },
+
+	// 换友链、在聚合站登记时，对方要的是一个能直接 <img> 的地址，而 /logo.png 是这
+	// 类场合最好猜的那个名字。指过去而不是把 icon.png 复制一份：同一张图两个文件，
+	// 换头像时必然漏掉一个，漏掉的那个还挂在别人站上。
+	// 用默认的临时跳转，不写 301——301 会被浏览器永久缓存，将来想让 /logo.png 换成
+	// 别的图就收不回来了
+	'/logo.png': { redirect: '/icon.png' },
 }
 
 export default homepageConfig
