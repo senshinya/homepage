@@ -15,6 +15,7 @@
     "lint:fix": "eslint --fix ."
   },
   "dependencies": {
+    "@iconify-json/ri": "catalog:ui",
     "@nuxt/icon": "catalog:ui",
     "@nuxt/image": "catalog:ui",
     "@nuxtjs/color-mode": "catalog:ui",

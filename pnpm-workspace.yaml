@@ -12,6 +12,7 @@ catalogs:
     eslint: ^10.2.0
     stylelint: ^17.6.0
   ui:
+    '@iconify-json/ri': ^1.2.10
     '@nuxt/icon': ^2.2.1
     '@nuxt/image': ^2.0.0
     '@nuxtjs/color-mode': ^4.0.0

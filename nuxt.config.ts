@@ -116,6 +116,18 @@ export default defineNuxtConfig({
 		classSuffix: '',
 	},
 
+	// 装了 @iconify-json/ri，服务端就不必再去 api.iconify.design 现取。
+	// clientBundle.scan 再把源码里出现过的图标直接打进客户端包：全站只用 ri 一套、
+	// 23 个图标，体积可控，换来的是图标不吊在第三方接口上——那个接口一慢，
+	// 页面上就是一排空洞
+	icon: {
+		clientBundle: {
+			scan: {
+				globInclude: ['**/*.{vue,jsx,tsx,ts}'],
+			},
+		},
+	},
+
 	image: {
 		provider: 'none',
 	},
