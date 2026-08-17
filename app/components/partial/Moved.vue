@@ -564,11 +564,7 @@ const note = computed(() => {
 	}
 }
 
-@keyframes skeleton-pulse {
-	50% {
-		opacity: 0.4;
-	}
-}
+// skeleton-pulse 的关键帧在 main.scss，全站骨架共用
 
 @media (prefers-reduced-motion: reduce) {
 	.skeleton > .skeleton-bar {

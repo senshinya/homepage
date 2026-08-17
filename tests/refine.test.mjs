@@ -216,6 +216,56 @@ test('project skeleton mirrors the loaded row geometry and information density',
 	assert.match(projectPage, /&:nth-child\(even\)\s*\{[\s\S]*?grid-template-columns:\s*var\(--project-text-w\) var\(--project-plate-w\);[\s\S]*?> \.skeleton-plate\s*\{[\s\S]*?order:\s*2;/)
 })
 
+// 静止的灰块读起来像「样式没加载」，不像「正在加载」。全站三处骨架统一呼吸，
+// 关键帧只留 main.scss 那一份——三份一字不差的 50% { opacity: 0.4 } 迟早各自演进
+test('every skeleton breathes from the one shared keyframe', () => {
+	const globalStyles = read('app/assets/main.scss')
+	const skeletons = {
+		'app/pages/project.vue': /\.skeleton-plate,[\s\S]*?animation:\s*skeleton-pulse 1\.6s ease-in-out infinite;/,
+		'app/components/partial/Moved.vue': /> \.skeleton-bar\s*\{[\s\S]*?animation:\s*skeleton-pulse 1\.6s ease-in-out infinite;/,
+		'app/components/partial/Memo.vue': /&::before\s*\{[\s\S]*?animation:\s*skeleton-pulse 1\.6s ease-in-out infinite;/,
+	}
+
+	assert.match(globalStyles, /@keyframes skeleton-pulse\s*\{\s*50%\s*\{\s*opacity:\s*0\.4;/)
+
+	for (const [path, usage] of Object.entries(skeletons)) {
+		const source = read(path)
+		assert.match(source, usage, `${path} 应当引用共用的 skeleton-pulse`)
+		// 本地不得再留一份同名关键帧，否则 Vue 会把它重写成 scoped 版把全局那份挡掉
+		assert.doesNotMatch(source, /@keyframes skeleton-pulse/, `${path} 不该再自带关键帧`)
+		// 呼吸是装饰，晕动症用户那边必须能整个关掉
+		assert.match(source, /prefers-reduced-motion: reduce\)\s*\{[\s\S]*?animation:\s*none;/, `${path} 缺 reduced-motion 兜底`)
+	}
+
+	// 骨架底色三处同源：--c-bg-1 在浅色下只比纸面深 3%，淡到 0.4 就看不见了
+	assert.match(read('app/pages/project.vue'), /\.skeleton-plate,[\s\S]*?background-color:\s*var\(--c-bg-soft\);/)
+	assert.doesNotMatch(collectSourceFiles('app').map(path => read(path)).join('\n'), /memo-image-skeleton/)
+})
+
+// 骨架屏和「逐条升起」讲的是两件相反的事：前者说内容已经在这儿了、只差数据，
+// 后者说此前空无一物。摆过骨架的页面若再让首屏那批从 opacity 0 升起，交接处会空
+// 掉一页，并把已经到手的数据再压住半秒——骨架争来的感知速度原样还回去
+test('pages that show a skeleton settle the first batch instead of animating it in', () => {
+	const composable = read('app/composables/useRevealStagger.ts')
+	const projectPage = read('app/pages/project.vue')
+	const memosPage = read('app/pages/memos.vue')
+
+	// 首批同步判位、同步就位：压在 flush: 'post' 上，DOM 已在而浏览器未画，才没有空白帧
+	assert.match(composable, /settleFirstBatch\?:\s*boolean/)
+	assert.match(composable, /flush:\s*'post'/)
+	assert.match(composable, /getBoundingClientRect\(\)\.top/)
+	// 硬切，不是快速淡入——读过 rect 之后再加 .seen 会照常过渡 0.5s
+	assert.match(composable, /transition\s*=\s*'none'[\s\S]*?classList\.add\('seen'\)/)
+
+	// observer 的判定线和首批的判定线必须同源，否则两处会各自演进
+	assert.match(composable, /rootMargin:\s*`0px 0px -\$\{bottomInset \* 100\}% 0px`/)
+	assert.doesNotMatch(composable, /rootMargin\?:\s*string/)
+
+	// 项目页有骨架，开；碎语页只有一行「加载中…」，首屏那道波仍然成立，不开
+	assert.match(projectPage, /useRevealStagger\(list,\s*\{[^}]*settleFirstBatch:\s*true/)
+	assert.doesNotMatch(memosPage, /settleFirstBatch/)
+})
+
 test('language segments use the local palette and normalize visible shares', async () => {
 	const moduleUrl = new URL('../app/utils/languageColor.ts', import.meta.url)
 

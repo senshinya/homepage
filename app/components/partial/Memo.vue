@@ -234,7 +234,7 @@ function settleImage(src: string) {
 			inset: 0;
 			background-color: var(--c-bg-soft);
 			transition: opacity var(--motion-base) var(--ease-out);
-			animation: memo-image-skeleton 1.6s ease-in-out infinite;
+			animation: skeleton-pulse 1.6s ease-in-out infinite;
 		}
 
 		&.is-image-settled::before {
@@ -264,11 +264,7 @@ function settleImage(src: string) {
 	}
 }
 
-@keyframes memo-image-skeleton {
-	50% {
-		opacity: 0.4;
-	}
-}
+// skeleton-pulse 的关键帧在 main.scss，全站骨架共用
 
 @media (prefers-reduced-motion: reduce) {
 	// 起手就是终态。只关 transition 不改 opacity 的话，.seen 到来之前整列是隐形的

@@ -150,6 +150,15 @@ mark {
 	margin: 0 auto;
 }
 
+// 骨架块的呼吸。全站三处骨架——项目行、旧链接卡、碎语图片——本来各写各的，
+// 三份 50% { opacity: 0.4 } 一字不差。放在这里而不是各自的 <style scoped> 里：
+// Vue 只重写本块内定义的 @keyframes，引用全局名字是安全的，于是节奏改一次就都改
+@keyframes skeleton-pulse {
+	50% {
+		opacity: 0.4;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	:root {
 		--motion-fast: 0.01ms;

@@ -24,13 +24,19 @@ const projects = computed(() => data.value?.projects ?? [])
 
 // 逐行升起。一个 observer 管整列，同一帧进视口的几行才能错开先后——
 // 每行各挂一个的话它们只会一起亮。项目行又高又少，一屏顶多两三行，
-// 故步子迈得比碎语大，档位也用不上几档
+// 故步子迈得比碎语大，档位也用不上几档。
+//
+// settleFirstBatch —— 这页前面摆了骨架屏，首屏那几行是顶替骨架就位的，不是到场，
+// 再从 opacity 0 升一次就成了「骨架 → 空白 → 慢慢浮现」，把骨架的意义整个抵消掉。
+// 碎语页没有骨架（只有一行「加载中…」），那边的首屏波浪仍然成立，故不开这个开关
 const list = useTemplateRef<HTMLElement>('list')
-useRevealStagger(list, { step: 90, cap: 3 })
+useRevealStagger(list, { step: 90, cap: 3, settleFirstBatch: true })
 </script>
 
 <template>
-<!-- 骨架复刻真实项目的两栏、交错和 3:2 图片，数据到货时位置不跳 -->
+<!-- 骨架复刻真实项目的两栏、交错和 3:2 图片：对齐的是每行的几何，不是行数——
+	项目有几个要取数才知道。首屏那一两行因此原地换成真内容，页面总高度的变化
+	都发生在折线以下，看不见 -->
 <div v-if="loading" class="project-layout skeletons" aria-hidden="true">
 	<div v-for="n in 3" :key="n" class="skeleton">
 		<div class="skeleton-plate" />
@@ -102,11 +108,23 @@ useRevealStagger(list, { step: 90, cap: 3 })
 	}
 }
 
+// 底色用 --c-bg-soft 而不是 --c-bg-1，和另两处骨架同源。--c-bg-1 在浅色下只比
+// 纸面深 3%，淡到 opacity 0.4 就只剩 1.2% 对比度——呼吸等于没做。整组一起呼吸，
+// 不按行错开：错开讲的是「逐个到场」，而骨架讲的是「都还在等」
+.skeleton-plate,
+.skeleton-name,
+.skeleton-description,
+.skeleton-meta,
+.skeleton-language,
+.skeleton-logs > i {
+	background-color: var(--c-bg-soft);
+	animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
 .skeleton-plate {
 	width: 100%;
 	aspect-ratio: 3 / 2;
 	border-radius: 8px;
-	background-color: var(--c-bg-1);
 }
 
 .skeleton-body {
@@ -123,7 +141,6 @@ useRevealStagger(list, { step: 90, cap: 3 })
 .skeleton-logs > i {
 	display: block;
 	border-radius: 0.3rem;
-	background-color: var(--c-bg-1);
 }
 
 .skeleton-name {
@@ -174,5 +191,16 @@ useRevealStagger(list, { step: 90, cap: 3 })
 	gap: 1rem;
 	margin: 3rem 0;
 	color: var(--c-text-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton-plate,
+	.skeleton-name,
+	.skeleton-description,
+	.skeleton-meta,
+	.skeleton-language,
+	.skeleton-logs > i {
+		animation: none;
+	}
 }
 </style>
