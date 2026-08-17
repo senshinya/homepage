@@ -9,7 +9,13 @@ export default defineNuxtConfig({
 			link: [
 				{ rel: 'icon', href: homepageConfig.favicon },
 				// "InterVariable", "Inter", "InterDisplay"
-				{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css', media: 'print', onload: 'this.media="all"' },
+				//
+				// 不要再加 media="print" onload='this.media="all"' 那套异步加载：这条
+				// 字体栈把 InterVariable 排在第一位，样式表没生效的那段时间里这个字体族
+				// 根本不存在，正文会先用后面的 Noto Sans SC 画一遍，等 onload 翻回 all
+				// 再换成 Inter。两个字体的字宽差得远，换的那一下不是闪一下，是整段重排。
+				// 省下的那点阻塞时间买不回这个抖动
+				{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css' },
 			],
 			meta: [
 				{ name: 'author', content: [homepageConfig.author.name, homepageConfig.author.email].filter(Boolean).join(', ') },
